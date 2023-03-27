@@ -4,20 +4,36 @@ import java.util.Scanner;
 
 public class Main {
     private static Scanner s = new Scanner(System.in);
-    private static String secret = "9305";
+    private static String secret = "";
     public static void main(String[] args) {
-//        System.out.println("The secret code is prepared: ****.\n\n" +
-//                "Turn 1. Answer:\n1234\n" +
-//                "Grade: None.\n\n" +
-//                "Turn 2. Answer:\n9876\n" +
-//                "Grade: 4 bulls.\nCongrats! The secret code is 9876.");
-        int cows = 0;
-        int bulls = 0;
-        int[] result = new int[2];
-        String input = s.next();
-        result[0] = calculateCows(input, result[0]);
-        result[1] = calculateBulls(input, result[0], result[1]);
-        grade(result[0], result[1] );
+        int lengthOfSecretCode = s.nextInt();
+        if (lengthOfSecretCode > 10) {
+            System.out.println("Error: can't generate a secret number with a length of" +
+                    " 11 because there aren't enough unique digits.");
+        }
+        else {
+            long pseudoRandomNumber = System.nanoTime();
+            String tempSecret = String.valueOf(pseudoRandomNumber);
+            secret = generateSecretCode(tempSecret, lengthOfSecretCode);
+            while (secret.length() != lengthOfSecretCode) {
+                secret = generateSecretCode(String.valueOf(System.nanoTime()), lengthOfSecretCode);
+            }
+            System.out.println(secret);
+        }
+    }
+
+    private static String generateSecretCode(String tempSecret, int length) {
+        int count = 0;
+        for (int i = 0; i < tempSecret.length(); i++) {
+            if (!secret.contains("" + tempSecret.charAt(i))) {
+                secret = secret + tempSecret.charAt(i);
+                count++;
+            }
+            if (count == length) {
+                return secret;
+            }
+        }
+        return secret;
     }
 
     private static void grade(int cows, int bulls) {
