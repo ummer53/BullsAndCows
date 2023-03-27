@@ -55,10 +55,10 @@ public class Main {
     }
 
     private static void grade(int cows, int bulls) {
-        if (bulls > 1 && cows > 1) {
+        if (bulls > 0 && cows > 0) {
+            if (bulls == 1 && cows == 1)
+                System.out.printf("Grade: %d bull and %d cow%n",bulls,cows);
             System.out.printf("Grade: %d bulls and %d cows%n",bulls,cows);
-        } else if (bulls == 1 && cows == 1) {
-            System.out.printf("Grade: %d bull and %d cow%n",bulls,cows);
         } else if (bulls == 0 && cows != 0) {
             if (cows == 1) {
                 System.out.printf("Grade: %d cow%n", cows);
