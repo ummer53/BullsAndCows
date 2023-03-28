@@ -14,82 +14,85 @@ public class Difficulty {
     static Random random = new Random();
 
     public  Difficulty() {
-        System.out.println("Input the length of the secret code:");
-        lengthOfSecretCode = s.nextInt();
-        System.out.println("Input the number of possible symbols in the code:");
-        symbolRange = s.nextInt();   // to store the number of distinct symbols user wants to use in code
-        while (lengthOfSecretCode > symbolRange) {
-            System.out.println("Error: can't generate a secret number with a length of" +
-                    " 11 because there aren't enough unique digits.");
+        determineDifficulty();
+        fillSymbolList();
+        String difficulty = secretCodeLength();
+        generateCode();
+        System.out.printf("The secret is prepared: %s%n",difficulty);
+    }
+
+    private void generateCode() {
+        long lowerRange = (long) Math.pow(10,lengthOfSecretCode);
+        long upperRange = (long) Math.pow(10, (lengthOfSecretCode * 2));
+        long pseudoRandomNumber = random.nextLong(upperRange);
+        while (pseudoRandomNumber < lowerRange) {
+            pseudoRandomNumber = random.nextLong(upperRange) + lowerRange;
+        }
+        String tempSecret = String.valueOf(pseudoRandomNumber);
+        secret = generateMixedSecretCode(tempSecret);
+
+    }
+
+    private void determineDifficulty() {
+        boolean canPlay = true;
+        while (canPlay) {
             System.out.println("Input the length of the secret code:");
             lengthOfSecretCode = s.nextInt();
             System.out.println("Input the number of possible symbols in the code:");
             symbolRange = s.nextInt();
+            if (lengthOfSecretCode <= symbolRange)
+                canPlay = false;
+            else
+                System.out.println("Error: can't generate a secret number with a length of" +
+                        " 11 because there aren't enough unique digits.");
         }
-            fillSymbolList(symbolRange);
-        String difficulty = secretCodeLength(lengthOfSecretCode);
-        long lowerRange = (long) Math.pow(10,lengthOfSecretCode);
-            long upperRange = (long) Math.pow(10, (lengthOfSecretCode * 3));
-
-            long pseudoRandomNumber = random.nextLong(upperRange);
-            while (pseudoRandomNumber < lowerRange) {
-                pseudoRandomNumber = random.nextLong(upperRange) + lowerRange;
-            }
-            String tempSecret = String.valueOf(pseudoRandomNumber);
-            while (secret.length() != lengthOfSecretCode) {
-                secret = generateMixedSecretCode(tempSecret, lengthOfSecretCode);
-                tempSecret = String.valueOf(random.nextLong(upperRange));
-            }
-            System.out.printf("The secret is prepared: %s%n",difficulty);
-
     }
 
-    private static void fillSymbolList(int symbolRange) {
+    private static void fillSymbolList() {
         symbols = new ArrayList<>(symbolRange);
-        int  decimalRange = 10;
-        if (symbolRange < decimalRange) {
-            for (int i = 0; i < symbolRange; i++) {
-                symbols.add((char)((char)i + '0'));
-            }
+        int range = symbolRange;
+        if (range < 11) {
+            fillNumericList(range);
         }
         else {
-            for (int i = 0; i < decimalRange; i++) {
-                symbols.add((char)((char)i + '0'));
-            }
-            symbolRange = symbolRange - decimalRange;
-            for (int i = 0; i < symbolRange; i++) {
-                symbols.add((char)((char)i + 'a'));
-            }
-
+            int  decimalRange = 10;
+            fillNumericList(decimalRange);
+            range = range - decimalRange;
+            fillCharList(range);
         }
     }
-    private static String generateMixedSecretCode(String tempSecret, int length) {
-        int count = 0;
-        secret = "";
-        for (int i = 0; i < length; i++) {
-            if (symbols.size() == 1) {
-                return secret + symbols.get(0);
-            }
+
+    private static void fillCharList(int range) {
+        for (int i = 0; i < range; i++) {
+            symbols.add((char)((char)i + 'a'));
+        }
+    }
+
+    private static void fillNumericList(int decimalRange) {
+        for (int i = 0; i < decimalRange; i++) {
+            symbols.add((char)((char)i + '0'));
+        }
+    }
+
+    private static String generateMixedSecretCode(String tempSecret) {
+        for (int i = 0; i < lengthOfSecretCode; i++) {
             int index = ((String.valueOf(random.nextInt(100)) + tempSecret.charAt(i)).hashCode()) % symbols.size();
             char c = symbols.get(index);
             symbols.remove(index);
             secret = secret + c;
-            count++;
-        }
-        if (count == length) {
-            return secret;
         }
         return secret;
     }
-    private static String secretCodeLength(int lengthOfSecretCode) {
-        String secretCodeLength = "";
-        int i = 0;
-        while (i < lengthOfSecretCode) {
-            secretCodeLength += '*';
-            i++;
-        }
 
-        return secretCodeLength + " (" + (symbolRange < 11 ? ("0-%c".formatted(symbols.get(symbols.size() - 1))) :
-                ("0-9, a-%c".formatted(symbols.get(symbols.size() - 1)))) + ")";
+    private static String secretCodeLength() {
+        System.out.println(symbols);
+        String difficulty = "*".repeat(lengthOfSecretCode);
+        if (symbolRange <= 10) {
+            System.out.println("this");
+            difficulty += "(0-%d).".formatted( symbolRange - 1);
+        } else {
+            difficulty += "(0-9, a-%c).".formatted(symbols.get(symbols.size() - 1));
+        }
+        return difficulty;
     }
 }

@@ -35,8 +35,7 @@ public class GamePlay {
     private static int calculateCows(String input, int cows) {
         char[] inputArray = input.toCharArray();
         for (char c : inputArray) {
-            String temp = "" + c;
-            if (Difficulty.secret.contains(temp)) {
+            if (Difficulty.secret.contains("" + c)) {
                 cows++;
             }
         }
