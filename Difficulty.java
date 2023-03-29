@@ -11,14 +11,20 @@ public class Difficulty {
     static List<Character> symbols;
     static int lengthOfSecretCode;
     static int symbolRange;
+    static String number = "1234567890";
+    static String allowedGuess = "0123456789abcdefghijklmnopqrstuvwxyz";
     static Random random = new Random();
 
-    public  Difficulty() {
-        determineDifficulty();
-        fillSymbolList();
-        String difficulty = secretCodeLength();
-        generateCode();
-        System.out.printf("The secret is prepared: %s%n",difficulty);
+    public boolean Difficulty() {
+        if(determineDifficulty()) {
+            fillSymbolList();
+            String difficulty = secretCodeLength();
+          //  System.out.println("Hi");
+            generateCode();
+            System.out.printf("The secret is prepared: %s%n", difficulty);
+            return true;
+        }
+        return false;
     }
 
     private void generateCode() {
@@ -33,19 +39,49 @@ public class Difficulty {
 
     }
 
-    private void determineDifficulty() {
-        boolean canPlay = true;
-        while (canPlay) {
+    private boolean determineDifficulty() {
             System.out.println("Input the length of the secret code:");
-            lengthOfSecretCode = s.nextInt();
+            String codeLength = s.nextLine();
+            if (validNum(codeLength)) {
+                lengthOfSecretCode = Integer.valueOf(codeLength);
+            }
+            else {
+                System.out.printf("Error: \"%s\" isn't a valid number.%n",codeLength);
+                return false;
+            }
             System.out.println("Input the number of possible symbols in the code:");
-            symbolRange = s.nextInt();
-            if (lengthOfSecretCode <= symbolRange)
-                canPlay = false;
-            else
-                System.out.println("Error: can't generate a secret number with a length of" +
-                        " 11 because there aren't enough unique digits.");
+            String uniqueSymbols = s.nextLine();
+            if (validNum(uniqueSymbols)) {
+                symbolRange = Integer.valueOf(uniqueSymbols);
+                if (symbolRange > 36) {
+                    System.out.println("Error: maximum number of possible symbols in the code is 36 (0-9, a-z).");
+                    return false;
+                }
+            }
+            else {
+                System.out.printf("Error: \"%s\" isn't a valid number.%n",uniqueSymbols);
+                return false;
+            }
+
+            if (lengthOfSecretCode == 0 || lengthOfSecretCode > symbolRange){
+                System.out.printf("Error: it's not possible to generate a code with a length " +
+                        "of %d with %d unique symbols.%n",lengthOfSecretCode,symbolRange);
+                return false;
+            }
+            else {
+                return true;
+            }
+
+
+    }
+
+    private boolean validNum(String codeLength) {
+        for (int i = 0; i < codeLength.length(); i++) {
+            if (!number.contains("" + codeLength.charAt(i))) {
+                return false;
+            }
         }
+        return true;
     }
 
     private static void fillSymbolList() {
@@ -85,10 +121,10 @@ public class Difficulty {
     }
 
     private static String secretCodeLength() {
-        System.out.println(symbols);
+       // System.out.println(symbols);
         String difficulty = "*".repeat(lengthOfSecretCode);
         if (symbolRange <= 10) {
-            System.out.println("this");
+           // System.out.println("this");
             difficulty += "(0-%d).".formatted( symbolRange - 1);
         } else {
             difficulty += "(0-9, a-%c).".formatted(symbols.get(symbols.size() - 1));
